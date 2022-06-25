@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import { inputData } from "./func/inputData.js";
 import { divFile } from "./func/misc.js";
+import { removeData } from "./func/removeData.js";
 
 
 const start = () => {
@@ -23,6 +24,7 @@ const start = () => {
                 inputData();
                 break;
             case "Remove old Data":
+                removeData()
                 break;
             case "Others":
                 inquirer.prompt([{
