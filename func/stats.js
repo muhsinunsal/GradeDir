@@ -13,7 +13,7 @@ const fileQuantity = (dir) => {
     }
 }
 
-const courseQuantity = (dir) => {
+const courseS = (dir) => {
     const files = fs.readdirSync(dir);
     let scanned = [];
     files.forEach((file) => {
@@ -24,7 +24,11 @@ const courseQuantity = (dir) => {
             }
         }
     })
-    return scanned.length
+    return scanned
+}
+
+const courseQuantity = (dir) => {
+    return courseS(dir).length
 }
 
 const recordQuantity = (dir) => {
@@ -53,7 +57,9 @@ const personQuantity = (dir) => {
     return scanned.length
 }
 
-export const reCount = () => {
+export const cacheObj = JSON.parse(fs.readFileSync("./sources/cache.json", "utf-8"));
+
+cacheObj.reCount = () => {
     const cache = {};
     /*
     {
@@ -62,6 +68,7 @@ export const reCount = () => {
         "person": null,
         "records": null,
         "courses": null,
+        "course_quantity": null,
         "timeStamp": null
     }
     */
@@ -69,18 +76,17 @@ export const reCount = () => {
     cache.source = fileQuantity("./sources/json");
     cache.rawsource = fileQuantity("./sources/raw");
     cache.person = personQuantity("./sources/json");
-    cache.courses = courseQuantity("./sources/json")
+    cache.courses = courseS("./sources/json");
+    cache.course_quantity = courseQuantity("./sources/json");
     cache.records = recordQuantity("./sources/json");
 
     const updateDate = new Date();
     cache.timeStamp = updateDate.getTime();
 
     fs.writeFileSync(cacheDir, JSON.stringify(cache), "utf-8");
-}
+};
 
 export const promptStats = () => {
-    const cacheFile = fs.readFileSync(cacheDir, "utf-8");
-    const cacheObj = JSON.parse(cacheFile);
     const last_updated = new Date(cacheObj.timeStamp);
     const now = new Date();
     let diff = now.getTime() - cacheObj.timeStamp;
@@ -91,7 +97,7 @@ export const promptStats = () => {
         console.log(`Produced sources: ${chalk.bold(cacheObj.source)}`);
         console.log(`Raw sources: ${chalk.bold(cacheObj.rawsource)}`);
         console.log();
-        console.log(`Active Course Records: ${chalk.bold(cacheObj.courses)}`)
+        console.log(`Active Course Records: ${chalk.bold(cacheObj.course_quantity)}`)
         console.log(`Active Student Records: ${chalk.bold(cacheObj.person)}`);
         console.log(`Active Records: ${chalk.bold(cacheObj.records)}`);
         console.log(`\nStats last updated at [${chalk.green(last_updated.toLocaleString())}]`);

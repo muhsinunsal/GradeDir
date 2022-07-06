@@ -1,10 +1,11 @@
 import inquirer from "inquirer";
+import { promptCourseList } from "./func/courseList.js"; 1
 import { inputData } from "./func/inputData.js";
 import { divFile } from "./func/misc.js";
 import { removeData } from "./func/removeData.js";
-import { promptStats, reCount } from "./func/stats.js";
+import { promptStats, cacheObj } from "./func/stats.js";
 
-import chalk from "chalk";
+// UNUTMA !!   import chalk from "chalk";
 
 const start = () => {
     console.clear();
@@ -14,13 +15,14 @@ const start = () => {
         message: "Welcome to GradeDir\nWhat do you want do to ?",
         default: "Browse",
         choices: [
-            "Browse", "Search", "Enter new Data", "Remove old Data", "Others"
+            "Browse Courses", "Search Students", "Enter new Data", "Remove old Data", "Others"
         ]
     }]).then(({ menu }) => {
         switch (menu) {
-            case "Browse":
+            case "Browse Courses":
+                promptCourseList()
                 break;
-            case "Search":
+            case "Search Students":
                 break;
             case "Enter new Data":
                 inputData();
@@ -45,7 +47,7 @@ const start = () => {
                             promptStats();
                             break;
                         case "ReCount Stats":
-                            reCount();
+                            cacheObj.reCount();
                             break;
                         default:
                             start();
