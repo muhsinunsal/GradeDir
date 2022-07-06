@@ -2,7 +2,9 @@ import inquirer from "inquirer";
 import { inputData } from "./func/inputData.js";
 import { divFile } from "./func/misc.js";
 import { removeData } from "./func/removeData.js";
+import { promptStats, reCount } from "./func/stats.js";
 
+import chalk from "chalk";
 
 const start = () => {
     console.clear();
@@ -16,9 +18,9 @@ const start = () => {
         ]
     }]).then(({ menu }) => {
         switch (menu) {
-            case "Browse Courses":
+            case "Browse":
                 break;
-            case "Search Student":
+            case "Search":
                 break;
             case "Enter new Data":
                 inputData();
@@ -32,12 +34,18 @@ const start = () => {
                     name: "other",
                     default: "Back",
                     choices: [
-                        "Divide source", "Back", /* .... */
+                        "Divide source", "Stats", "ReCount Stats", "Back", /* .... */
                     ]
                 }]).then(({ other }) => {
                     switch (other) {
                         case "Divide source":
                             divFile();
+                            break;
+                        case "Stats":
+                            promptStats();
+                            break;
+                        case "ReCount Stats":
+                            reCount();
                             break;
                         default:
                             start();

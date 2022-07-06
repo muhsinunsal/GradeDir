@@ -31,7 +31,7 @@ export const removeData = () => {
                 console.log(chalk.red("Directories can't be choosen."))
             } else {
                 fs.rmSync(url);
-                console.log(chalk.green("Files removed successfully."))
+                console.log(chalk.green(`${path.parse(url).name} removed ${chalk.green("✓")}`))
             }
         });
     })
