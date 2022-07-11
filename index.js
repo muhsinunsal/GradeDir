@@ -5,8 +5,6 @@ import { divFile } from "./func/misc.js";
 import { removeData } from "./func/removeData.js";
 import { promptStats, cacheObj } from "./func/stats.js";
 
-// UNUTMA !!   import chalk from "chalk";
-
 const start = () => {
     console.clear();
     inquirer.prompt([{
