@@ -1,0 +1,15 @@
+[
+  {
+    "code": "EXAMPLE101",
+    "directory": null,
+    "rawDirectory": null,
+    "year": 2022,
+    "yearInt": 2122,
+    "semester": "Fall",
+    "gradings": [
+      ["Id", 0],
+      ["Midterm_1", 20],
+      ["Midterm_2", 20]
+    ]
+  }
+]
