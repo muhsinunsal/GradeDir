@@ -57,7 +57,7 @@ const personQuantity = (dir) => {
     return scanned.length
 }
 
-export const cacheObj = JSON.parse(fs.readFileSync("./sources/cache.json", "utf-8"));
+export const cacheObj = JSON.parse(fs.readFileSync("./src/cache.json", "utf-8"));
 
 cacheObj.reCount = () => {
     const cache = {};

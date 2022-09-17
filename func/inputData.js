@@ -1,130 +1,222 @@
-import chalk from "chalk";
-import fs from "fs";
+import fs, { read, readSync } from "fs";
 import path from "path";
 import inquirer from "inquirer";
 import inquirerFileTreeSelection from "inquirer-file-tree-selection-prompt";
+import chalk from "chalk";
 
-
-//A function to retrive data from txt file with two or more columns of data (seperated with tab)
-//And write them as json file as array of elements with properity of those rows value
-const newEnterence = (source, dest, row1 = "ID", [row2 = null, row3 = null, row4 = null, row5 = null, row6 = null] = []) => {
-    console.log(source);
-    let s = source;
-    let d;
-
-    if (dest) {
-        d = path.join("./", "sources", "json", `${dest}.json`);
-    } else {
-        d = path.join("./", "sources", "json", `${path.parse(s).name}.json`);
-    }
-    let jsonArray = [];
-    class Ele {
-        constructor() {
-            this.id;
-        }
-    }
-    const re = /[^\t\n\r\s]+/g;
-    let rawString = fs.readFileSync(s).toString();
-    let afterRegex = rawString.match(re);
-    if (afterRegex) {
-        if (row6) {
-            for (let i = 0; i < rawString.split("\n").length * 6; i += 6) {
-                let stu = new Ele();
-                stu.id = afterRegex[i];
-                stu[row2] = afterRegex[i + 1];
-                stu[row3] = afterRegex[i + 2];
-                stu[row4] = afterRegex[i + 3];
-                stu[row5] = afterRegex[i + 4];
-                stu[row6] = afterRegex[i + 5];
-                jsonArray.push(stu);
-            }
-        } else if (row5) {
-            for (let i = 0; i < rawString.split("\n").length * 5; i += 5) {
-                let stu = new Ele();
-                stu.id = afterRegex[i];
-                stu[row2] = afterRegex[i + 1];
-                stu[row3] = afterRegex[i + 2];
-                stu[row4] = afterRegex[i + 3];
-                stu[row5] = afterRegex[i + 4];
-                jsonArray.push(stu);
-            }
-        } else if (row4) {
-            for (let i = 0; i < rawString.split("\n").length * 4; i += 4) {
-                let stu = new Ele();
-                stu.id = afterRegex[i];
-                stu[row2] = afterRegex[i + 1];
-                stu[row3] = afterRegex[i + 2];
-                stu[row4] = afterRegex[i + 3];
-                jsonArray.push(stu);
-            }
-        } else if (row3) {
-            for (let i = 0; i < rawString.split("\n").length * 3; i += 3) {
-                let stu = new Ele();
-                stu.id = afterRegex[i];
-                stu[row2] = afterRegex[i + 1];
-                stu[row3] = afterRegex[i + 2];
-                jsonArray.push(stu);
-            }
-        } else if (row2) {
-            for (let i = 0; i < rawString.split("\n").length * 2; i += 2) {
-                let stu = new Ele();
-                stu.id = afterRegex[i];
-                stu[row2] = afterRegex[i + 1];
-                jsonArray.push(stu);
-            }
-        }
-        let data = JSON.stringify(jsonArray);
-        fs.writeFileSync(d, data);
-        return true
-    } else {
-        console.error("Couldnt get data");
-        return false
-    }
-}
-//A function to preview to certain lines of text 
-const filePreview = (source, lineNum) => {
-    let file = fs.readFileSync(source, "utf8");
-    let nthPos = file.split("\n", lineNum).join("\n").length;
-    let t = file.slice(0, nthPos);
-    let out = t.concat("\n\t.\n\t.\n\t.");
-
-    return out;
-}
-
+import fileNameParser from "./parsers/fileNameParser.js";
+import prompts from "../func/prompts.js";
+import CourseConfigs from "../func/objects/CourseConfigs.js";
+import Course  from "../func/objects/Course.js";
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
 
-//A function to ask questions to get data
-export const inputData = () => {
-    inquirer.prompt([{
-        type: "file-tree-selection",
-        name: "source",
-        message: "Source: ",
-        root: "sources/raw"
-    },
-    {
-        type: 'input',
-        name: 'destination',
-        message: "Save as (.json): ",
-    }
-        , {
-        type: "input",
-        name: "rows",
-        message: "Rows (1-6?):"
-    }
-    ]).then((answers) => {
-        console.clear();
 
-        let string = answers.rows.split(" ");
-        let log = "\n" + chalk.underline("Source: ") + chalk.cyan(answers.source) + "\n" + chalk.bold("Destination: ") + chalk.cyan(answers.destination + ".json") + "\n" + chalk.bold("Rows: ") + "\n" + filePreview(answers.source, 10) + "\n"
-        console.log(log)
-        inquirer.prompt([{
-            type: 'confirm',
-            name: 'confirm',
-            message: "Are these values correct ?"
-        }]).then((answer) => {
-            if (answer.confirm) {
-                newEnterence(answers.source, answers.destination, string[0], [string[1], string[2], string[3], string[4], string[5]])
-            }
-        })
+const configeDir = "./src/courses/course_configs.json";
+let gradingTypes = JSON.parse(fs.readFileSync("./src/GradingTypes.json"));
+
+const spacing_offset = 2;
+
+
+let configs = new CourseConfigs(configeDir);
+
+let toBeRecordedToCache;
+
+const chooseDirectory = (courseObject) => {  // 0
+    //console.log(chalk.bgGray("0"));
+    inquirer.prompt([{
+        name: "directory",
+        message: "Please choose sourse file destination",
+        type: "file-tree-selection",
+        root: "./src/raw",
+        hideRoot: true
+    }]).then(({ directory }) => {
+
+        courseObject.rawDirectory = directory;
+        courseObject.code = fileNameParser(courseObject.rawDirectory).code;
+        courseObject.year = fileNameParser(courseObject.rawDirectory).year;
+        courseObject.yearInt = parseInt(fileNameParser(courseObject.rawDirectory).yearInt);
+        courseObject.semester = fileNameParser(courseObject.rawDirectory).semester;
+
+        if (courseObject.code && courseObject.yearInt && courseObject.semester) {
+            let isRecorded = configs.getCourse(courseObject.code, courseObject.yearInt, courseObject.semester);
+
+            let courseConfig = configs.getCourse(courseObject.code, courseObject.yearInt, courseObject.semester)
+            if (courseConfig) {
+                console.log("");
+                prompts.gradingsAndRatios(courseConfig.gradings, spacing_offset);
+                console.log("");
+            } inquirer.prompt([{
+                name: "to_be_recorded",
+                message: `There is course ${!isRecorded ? chalk.red("isn't") : "is"} in cache. Do you want to continue?`,
+                type: "confirm"
+            }]).then(({ to_be_recorded }) => {
+                if (to_be_recorded) {
+                    toBeRecordedToCache = true;
+                    chooseGradingTypes(courseObject)
+                } else {
+                    //TODO Fowards to Starting Place
+                }
+            })
+
+        } else {
+            prompts.fileNaming(spacing_offset);
+        }
+
     })
-};
+}
+
+const gradingStringParse = (string) => string
+    .split(",")
+    .map(string => string.trim())
+    .map(string => string.split(" "))
+    .map(grading => [grading[0].charAt(0).toUpperCase() + grading[0].slice(1), Number(grading[1])]);
+
+const chooseGradingTypes = (courseObject2) => { // 2
+    //console.log(chalk.bgGray("2"));
+
+    console.log("");
+    //prompts.filePreview(courseObject2.rawDirectory, 5, spacing_offset);
+
+    inquirer.prompt([{
+        name: "rawGradings",
+
+        message: `Please enter your grading types and ratios if its more than one seperate with comma (Enter student id with ratio of 0):`,
+        type: "input",
+        prefix: prompts.filePreview(courseObject2.rawDirectory, 5, spacing_offset) + chalk.bold.green("?"),
+        validate(rawGradings) {
+            let gradingArr = gradingStringParse(rawGradings);
+
+            gradingArr.forEach(([name, ratio]) => {
+                if (isNaN(ratio)) {
+                    throw Error("Grading ratio is not reconised.");
+                }
+                if (ratio < 0 || ratio > 100) {
+                    throw Error(`Grading ratio must be between 0 and 100`);
+                }
+                if (!gradingTypes.includes(name)) {
+                    throw Error(`Grading type didn't reconised. Please look up to list bellow.\n${prompts.gradingNaming(spacing_offset)}`);
+                }
+            })
+            return true
+        }
+    }]).then(({ rawGradings }) => {
+        const newGradings = gradingStringParse(rawGradings);
+        const newGradingsNames = newGradings.map(grading => grading[0]);
+        let notReady = [];
+        let ready = [];
+        let courseConfig = configs.data.find(course => course.code == courseObject2.code && course.yearInt == courseObject2.yearInt)
+
+        if (courseConfig) {
+            newGradings.forEach(([newName, newRatio], i) => {
+                if (courseConfig.gradings.some(([oldName, oldRatio]) => oldName == newName)) {
+                    notReady.push([newName, newRatio]);
+                    console.log(" ".repeat(spacing_offset) + chalk.bold.red(newName))
+                } else {
+                    ready.push([newName, newRatio]);
+                    console.log(" ".repeat(spacing_offset) + chalk.bold.green(newName))
+                }
+            })
+            if (notReady.length) {
+                inquirer.prompt([{
+                    name: "conflict",
+                    type: "checkbox",
+                    message: "Please choose to overwrite." + chalk.bgYellowBright("?"),//TODO Daha düzgün cümle kur
+                    choices: notReady.map(course => course[0])
+                }]).then(({ conflict }) => {
+                    conflict.forEach(gradingName => {
+                        let x = notReady.find(([gName]) => gName == gradingName);
+                        if (x) {
+                            ready.push([gradingName, x[1]]);
+                        }
+                    })
+                    ready.sort((a, b) => {
+                        return newGradingsNames.indexOf(a[0]) - newGradingsNames.indexOf(b[0])
+                    })
+                    courseObject2.newGradings = [["Id", 0], ...ready];
+
+                    lastConfirmation(courseObject2);
+                })
+            } else {
+                courseObject2.newGradings = [["Id", 0], ...ready];
+                lastConfirmation(courseObject2);
+            }
+        } else {
+            courseObject2.newGradings = [["Id", 0], ...newGradings];
+            lastConfirmation(courseObject2);
+        }
+    })
+}
+
+const lastConfirmation = (courseObject3) => {
+    inquirer.prompt([{
+        name: "confirm",
+        type: "confirm",
+        message: "Do you confirm?"
+    }]).then(({ confirm }) => {
+        if (confirm) {
+            generateFile(courseObject3);
+        } else {
+            //TODO Foward to main menu
+        }
+    })
+}
+
+
+const generateFile = (courseObject4) => { // 3
+    //console.log(chalk.bgGray("3"));
+    let rawString;
+    const { code, rawDirectory, newGradings } = courseObject4;
+    const newGradingsNames = newGradings.map((grading) => grading[0]);
+    let semester = courseObject4.semester == "Fall" ? "F" : courseObject4.semester == "Spring" ? "S" : undefined;
+    courseObject4.directory = path.join(path.parse(path.parse(rawDirectory).dir).dir, "courses", `${courseObject4.code}_${courseObject4.yearInt}${semester}.json`);
+
+    const outArr = [];
+
+    if (fs.existsSync(courseObject4.directory) && (rawString = fs.readFileSync(rawDirectory, "utf-8").trim())) {
+        const courseConfig = configs.getCourse(courseObject4.code, courseObject4.yearInt, courseObject4.semester);
+        if (!courseConfig) {
+            console.log(chalk.bgRed("Course file exists but we don't have an archive of it."));
+        } else {
+            const course = JSON.parse(fs.readFileSync(courseObject4.directory, "utf-8"));
+            let rows = rawString.split("\n");
+            let out = rows.map(row => {
+                let nums = row.split("\t").map(word => word.trim()).map(num => num = !isNaN(num) ? Number(num) : num == "-" ? null : undefined)
+                let student = {};
+                for (let i in newGradingsNames) {
+                    student[newGradingsNames[i].toLowerCase()] = nums[i]
+                }
+                return student
+            })
+            const result = course.map(student => ({ ...student, ...out.find(stu => stu.id === student.id) }))
+            fs.writeFileSync(courseObject4.directory, JSON.stringify(result))
+            configs.updateCourse(courseObject4);
+            finnish(courseObject4);
+        }
+    } else {
+        rawString = fs.readFileSync(rawDirectory, "utf-8").trim();
+        let rows = rawString.split("\n");
+        let out = rows.map(row => {
+            let nums = row.split("\t").map(word => word.trim()).map(num => num = !isNaN(num) ? Number(num) : num == "-" ? null : undefined)
+            let student = {};
+            for (let i in newGradingsNames) {
+                student[newGradingsNames[i].toLowerCase()] = nums[i]
+            }
+            return student
+        })
+        console.countReset("Not Attended")
+        fs.writeFileSync(courseObject4.directory, JSON.stringify(out));
+        configs.addCourse(courseObject4);
+        finnish(courseObject4);
+    }
+
+}
+
+const finnish = (courseObject5) => {
+    prompts.courseConfigStatus(spacing_offset, courseObject5)
+}
+const generateEnteryObj = () => {
+    const object = new Course();
+    chooseDirectory(object);
+
+}
+export default generateEnteryObj
