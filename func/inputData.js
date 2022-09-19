@@ -1,15 +1,15 @@
-import fs, { read, readSync } from "fs";
+import fs from "fs";
 import path from "path";
 import inquirer from "inquirer";
 import inquirerFileTreeSelection from "inquirer-file-tree-selection-prompt";
 import chalk from "chalk";
 
+import {default as home} from "../index.js"
 import fileNameParser from "./parsers/fileNameParser.js";
 import prompts from "../func/prompts.js";
 import CourseConfigs from "../func/objects/CourseConfigs.js";
 import Course  from "../func/objects/Course.js";
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
-
 
 const configeDir = "./src/courses/course_configs.json";
 let gradingTypes = JSON.parse(fs.readFileSync("./src/GradingTypes.json"));
@@ -54,7 +54,7 @@ const chooseDirectory = (courseObject) => {  // 0
                     toBeRecordedToCache = true;
                     chooseGradingTypes(courseObject)
                 } else {
-                    //TODO Fowards to Starting Place
+                    home()
                 }
             })
 
@@ -75,7 +75,6 @@ const chooseGradingTypes = (courseObject2) => { // 2
     //console.log(chalk.bgGray("2"));
 
     console.log("");
-    //prompts.filePreview(courseObject2.rawDirectory, 5, spacing_offset);
 
     inquirer.prompt([{
         name: "rawGradings",
@@ -120,7 +119,7 @@ const chooseGradingTypes = (courseObject2) => { // 2
                 inquirer.prompt([{
                     name: "conflict",
                     type: "checkbox",
-                    message: "Please choose to overwrite." + chalk.bgYellowBright("?"),//TODO Daha düzgün cümle kur
+                    message: "Please choose gradings to overwrite." + chalk.bgYellowBright("?"),
                     choices: notReady.map(course => course[0])
                 }]).then(({ conflict }) => {
                     conflict.forEach(gradingName => {
@@ -156,7 +155,7 @@ const lastConfirmation = (courseObject3) => {
         if (confirm) {
             generateFile(courseObject3);
         } else {
-            //TODO Foward to main menu
+            home()
         }
     })
 }

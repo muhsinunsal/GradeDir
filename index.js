@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
 import { promptCourseList } from "./func/courseList.js"; 1
-import { inputData } from "./func/inputData.js";
+import inputData from "./func/inputData.js";
 import { divFile } from "./func/misc.js";
 import { removeData } from "./func/removeData.js";
 import { promptStats, cacheObj } from "./func/stats.js";
@@ -58,3 +58,5 @@ const start = () => {
 }
 
 start()
+
+export default start
