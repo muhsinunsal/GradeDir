@@ -26,6 +26,12 @@ export default class CourseConfigs {
         this.data = JSON.parse(fs.readFileSync(this.dir));
     }
 
+    removeCourse(filepath,courseObject) {
+        fs.rmSync(url);
+        this.data = this.data.filter(({ code, yearInt, semester }) => !(courseObject.code == code && courseObject.yearInt == yearInt && courseObject.semester == semester));
+        fs.writeFileSync(this.dir, JSON.stringify(this.data));
+    }
+
     updateCourse(courseObject) {
         let oldCourse = this.getCourse(courseObject.code, courseObject.yearInt, courseObject.semester);
 

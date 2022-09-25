@@ -1,9 +1,9 @@
 import inquirer from "inquirer";
-import { promptCourseList } from "./func/courseList.js"; 1
+//import { promptCourseList } from "./func/courseList.js"; 1
 import inputData from "./func/inputData.js";
 import { divFile } from "./func/misc.js";
-import { removeData } from "./func/removeData.js";
-import { promptStats, cacheObj } from "./func/stats.js";
+import { removeCourseData } from "./func/removeData.js";
+//import { promptStats, cacheObj } from "./func/stats.js";
 
 const start = () => {
     console.clear();
@@ -13,7 +13,7 @@ const start = () => {
         message: "Welcome to GradeDir\nWhat do you want do to ?",
         default: "Browse",
         choices: [
-            "Browse Courses", "Search Students", "Enter new Data", "Remove old Data", "Others"
+            "Browse Courses", "Search Students", "Enter new Data", "Remove old Course Data", "Others"
         ]
     }]).then(({ menu }) => {
         switch (menu) {
@@ -25,8 +25,8 @@ const start = () => {
             case "Enter new Data":
                 inputData();
                 break;
-            case "Remove old Data":
-                removeData()
+            case "Remove old Course Data":
+                removeCourseData()
                 break;
             case "Others":
                 inquirer.prompt([{
@@ -34,7 +34,19 @@ const start = () => {
                     name: "other",
                     default: "Back",
                     choices: [
-                        "Divide source", "Stats", "ReCount Stats", "Back", /* .... */
+                        {
+                            name: "Divide source",
+                            disabled: "Unavailable right now."
+                        },
+                        {
+                            name: "Stats",
+                            disabled: "Unavailable right now."
+                        },
+                        {
+                            name: "ReCount Stats",
+                            disabled: "Unavailable right now."
+                        },
+                        , "Back", /* .... */
                     ]
                 }]).then(({ other }) => {
                     switch (other) {
