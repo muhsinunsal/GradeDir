@@ -1,6 +1,6 @@
 import fs from "fs";
 
-let gradingTypes = JSON.parse(fs.readFileSync("./src/GradingTypes.json"));
+let gradingTypes = JSON.parse(fs.readFileSync("./func/objects/GradingTypes.json"));
 const mergeGradings = (mainArr, newArr) => mainArr.filter(e => newArr.find(a2e => a2e[0] === e[0]) === undefined).concat(newArr);
 
 export default class CourseConfigs {

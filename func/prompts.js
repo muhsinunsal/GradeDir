@@ -33,7 +33,7 @@ const fileNaming = (spacing, code = "EXAMPLE101", interval = "2122", semester = 
 }
 
 const gradingNaming = (spacing) => {
-    const arr = JSON.parse(fs.readFileSync("./src/GradingTypes.json", "utf-8"));
+    const arr = JSON.parse(fs.readFileSync("./func/objects/GradingTypes.json", "utf-8"));
     let str = "";
     arr.forEach(grading => str += " ".repeat(spacing + 2) + chalk.bold.yellow(grading) + "\n");
     return str

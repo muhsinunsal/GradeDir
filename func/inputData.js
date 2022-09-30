@@ -12,7 +12,7 @@ import Course  from "../func/objects/Course.js";
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
 
 const configeDir = "./src/courses/course_configs.json";
-let gradingTypes = JSON.parse(fs.readFileSync("./src/GradingTypes.json"));
+let gradingTypes = JSON.parse(fs.readFileSync("./func/objects/GradingTypes.json"));
 
 const spacing_offset = 2;
 
