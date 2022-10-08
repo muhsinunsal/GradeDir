@@ -1,84 +1,287 @@
-const facultyIds = {
-    "Aviation": 11,
-    "Arts Sciences": 20,
-    "Arts Architecture": null,
-    "Law": null,
-    "Business": 23,
-    "Engineering": 24,
-    "HealthServices": 25,
-    "Medical": 26
-}
+const facultys = [
+    {
+        name: "Aviation",
+        code: 11,
+        departments: [
+            {
+                name: "AVM",
+                code: 86,
+                fullName: "Aviation Management"
+            },
+            {
+                name: "PLT",
+                code: 13,
+                fullName: "Pilot Training"
+            },
+            {
+                name: "AEE",
+                code: 14,
+                fullName: "Avionics"
+            },
+            {
+                name: "APM",
+                code: 15,
+                fullName: "Airframe and Powerplant Maintenance"
+            },
 
-const departmentIds = {
-    //Arts Scienes
-    "English Language and Literature": null,
-    "English Translation and Interpretation": null,
-    "Mathematics": 18,
-    "Psychology": 20,
+        ]
+    },
+    {
+        name: "Faculty of Arts & Sciences",
+        code: 20,
+        departments: [
+            {
+                name: "ELIT",
+                code: null,
+                fullName: "English Language and Literature"
+            },
+            {
+                name: "ETI",
+                code: null,
+                fullName: "English Translation and Interpretation"
+            },
+            {
+                name: "MATH",
+                code: 18,
+                fullName: "Mahematics"
+            },
+            {
+                name: "PSY",
+                code: 20,
+                fullName: "Psychology"
+            }
+        ]
+    },
+    {
+        name: "Vocational School",
+        code: null,
+        departments: [
+            {
+                name: "ADA",
+                code: null,
+                fullName: "Justice Program"
+            }
+        ]
+    },
+    {
+        name: "Health Sciences",
+        code: 25,
+        departments: [
+            {
+                name: "NUT",
+                code: 77,
+                fullName: "Nutrition and Dietetics"
+            },
+            {
+                name: "CHL",
+                code: null,
+                fullName: "Child Development"
+            },
+            {
+                name: "PTR",
+                code: 79,
+                fullName: "Physiotherapy and Rehabilitation"
+            },
+            {
+                name: "NURS",
+                code: 80,
+                fullName: "Nursing"
+            },
+            {
+                name: "ODY",
+                code: 76,
+                fullName: "Audiology"
+            },
 
-    //Arts Architecture
-    "Industrial Design": null,
-    "Graphic Design": null,
-    "Interior Architecture and Environmental Design": null,
-    "Architecture": null,
-    "Textile and Fashion Design": null,
+        ]
+    },
+    {
+        name: "Faculty of Engineering",
+        code: 24,
+        departments: [
+            {
+                name: "CMPE",
+                code: 35,
+                fullName: "Computer Enginnering"
+            },
+            {
+                name: "ISE",
+                code: 36,
+                fullName: "Information Systems Engineering"
+            },
+            {
+                name: "EE",
+                code: 37,
+                fullName: "Electrical Electronics Engineering"
+            },
+            {
+                name: "IE",
+                code: 38,
+                fullName: "Industrial Engineering"
+            },
+            {
+                name: "ENE",
+                code: 39,
+                fullName: "Energy Systems Engineering"
+            },
+            {
+                name: "MFGE",
+                code: null,
+                fullName: "Manufacturing Engineering"
+            },
+            {
+                name: "CE",
+                code: 41,
+                fullName: "Civil Engineering"
+            },
+            {
+                name: "CHE",
+                code: 41,
+                fullName: "Chemical Engineering"
+            },
+            {
+                name: "ME",
+                code: 41,
+                fullName: "Mechanical Engineering"
+            },
+            {
+                name: "MECE",
+                code: 41,
+                fullName: "Mechatronics Engineering"
+            },
+            {
+                name: "MATE",
+                code: 41,
+                fullName: "Metallurgical and Materials Engineering"
+            },
+            {
+                name: "AE",
+                code: 41,
+                fullName: "Automotive Engineering"
+            },
+            {
+                name: "SE",
+                code: 41,
+                fullName: "Software Engineering"
+            },
+            {
+                name: "ASE",
+                code: 48,
+                fullName: "Aerospace Engineering"
+            }
+        ]
+    },
+    {
+        name: "Bussines",
+        code: 23,
+        departments: [
+            {
+                name: "PR",
+                code: 27,
+                fullName: "Public Relations and Advertising"
+            },
+            {
+                name: "IKT",
+                code: null,
+                fullName: "Economics"
+            },
+            {
+                name: "ECON",
+                code: 28,
+                fullName: "Economics EN"
+            },
+            {
+                name: "ISL",
+                code: null,
+                fullName: "Business"
+            },
+            {
+                name: "MAN",
+                code: 29,
+                fullName: "Business EN"
+            },
+            {
+                name: "MLY",
+                code: null,
+                fullName: "Public Finance"
+            },
+            {
+                name: "KAM",
+                code: null,
+                fullName: "Political Science and Public Administration"
+            },
+            {
+                name: "TOUR",
+                code: 0,
+                fullName: "Tourism Management"
+            }
+            ,
+            {
+                name: "IR",
+                code: 33,
+                fullName: "International Relations"
+            },
+            {
+                name: "LOG",
+                code: 34,
+                fullName: "International Trade and Logistics"
+            },
+        ]
+    },
+    {
+        name: "Law",
+        code: null,
+        departments: [
+            {
+                name: "LAW",
+                code: null,
+                fullName: "Law"
+            }
+        ]
+    },
+    {
+        name: "Faculty of Fine Arts, Design & Architecture",
+        code: null,
+        departments: [
+            {
+                name: "EUT",
+                code: null,
+                fullName: "Industrial Design",
+            },
+            {
+                name: "GRT",
+                code: null,
+                fullName: "Graphic Design",
+            },
+            {
+                name: "ICM",
+                code: null,
+                fullName: "Interior Architecture and Environmental Design",
+            },
+            {
+                name: "MMR",
+                code: null,
+                fullName: "Architecture"
+            },
+            {
+                name: "MTT",
+                code: null,
+                fullName: "Textile and Fashion Design",
+            }
+        ]
+    },
 
-    //Law
-    "Law": null,
 
-    //Business
-    "Public Relations and Advertising": 27,
-    "Economics": null,
-    "Economics (EN)": 28,
-    "Business": null,
-    "Business (EN)": 29,
-    "Public Finance": null,
-    "Political Science and Public Administration": null,
-    "Tourism Management": 32,
-    "International Relations": 33,
-    "International Trade and Logistics": 34,
-
-    //Engineering
-    "Computer Engineering": 35,
-    "Information Systems Engineering": 36,
-    "Electrical Electronics Engineering": 37,
-    "Industrial Engineering": 38,
-    "Energy Systems Engineering": 39,
-    "Aerospace Engineering": 48,
-    "Manufacturing Engineering": null,
-    "Civil Engineering": 41,
-    "Chemical Engineering": 42,
-    "Mechanical Engineering": 43,
-    "Mechatronics Engineering": 45,
-    "Metallurgical and Materials Engineering": 45,
-    "Automotive Engineering": 46,
-    "Software Engineering": 47,
-
-    //Health Sciences
-    "Nutrition and Dietetics": 77,
-    "Child Development": null,
-    "Physiotherapy and Rehabilitation": 79,
-    "Nursing": 80,
-    "Audiology": 76,
-
-    //Vocational School
-    "Justice Program": null,
-
-    //Civil Aviation
-    "Aviation Management": 86,
-    "Pilot Training": 13,
-    "Avionics": 14,
-    "Airframe and Powerplant Maintenance": 15,
-}
+]
 
 const studentIdParser = (id) => {
     id = String(id)
     const out = {};
-    const findInObjectById = (obj, id) => Object.keys(obj).find(e => obj[e] == id)
 
     out.registerYear = Number("20" + id.slice(0, 2));
-    out.faculty = findInObjectById(facultyIds,id.slice(2,4));
-    out.department = findInObjectById(departmentIds,id.slice(4,6));
+    out.faculty = facultys.find(faculty => faculty.code == id.slice(2, 4));
+    out.department = out.faculty.departments.find(dep => dep.code == id.slice(4,6));
     return out
 }
+
 export default studentIdParser
