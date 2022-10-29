@@ -4,11 +4,11 @@ import inquirer from "inquirer";
 import inquirerFileTreeSelection from "inquirer-file-tree-selection-prompt";
 import chalk from "chalk";
 
-import {default as home} from "../index.js"
+import { default as home } from "../index.js"
 import fileNameParser from "./parsers/fileNameParser.js";
 import prompts from "../func/prompts.js";
 import CourseConfigs from "../func/objects/CourseConfigs.js";
-import Course  from "../func/objects/Course.js";
+import CourseRecord from "../func/objects/Course.js";
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
 
 const configeDir = "./src/courses/course_configs.json";
@@ -33,8 +33,8 @@ const chooseDirectory = (courseObject) => {  // 0
 
         courseObject.rawDirectory = directory;
         courseObject.code = fileNameParser(courseObject.rawDirectory).code;
-        courseObject.year = fileNameParser(courseObject.rawDirectory).year;
         courseObject.yearInt = parseInt(fileNameParser(courseObject.rawDirectory).yearInt);
+        courseObject.year = fileNameParser(courseObject.rawDirectory).year;
         courseObject.semester = fileNameParser(courseObject.rawDirectory).semester;
 
         if (courseObject.code && courseObject.yearInt && courseObject.semester) {
@@ -65,11 +65,16 @@ const chooseDirectory = (courseObject) => {  // 0
     })
 }
 
-const gradingStringParse = (string) => string
-    .split(",")
-    .map(string => string.trim())
-    .map(string => string.split(" "))
-    .map(grading => [grading[0].charAt(0).toUpperCase() + grading[0].slice(1), Number(grading[1])]);
+const gradingStringParse = (string) => {
+    let parsedArr = string.split(",").map(str => str.trim());
+    let obj = {};
+    parsedArr.forEach(gradingRatioCombo => {
+        let [grading, ratio] = gradingRatioCombo.split(" ");
+        grading = grading.charAt(0).toUpperCase() + grading.slice(1);
+        obj[grading] = ratio;
+    });
+    return obj
+}
 
 const chooseGradingTypes = (courseObject2) => { // 2
     //console.log(chalk.bgGray("2"));
@@ -82,10 +87,14 @@ const chooseGradingTypes = (courseObject2) => { // 2
         message: `Please enter your grading types and ratios if its more than one seperate with comma (Enter student id with ratio of 0):`,
         type: "input",
         prefix: prompts.filePreview(courseObject2.rawDirectory, 5, spacing_offset) + chalk.bold.green("?"),
+        
         validate(rawGradings) {
             let gradingArr = gradingStringParse(rawGradings);
 
-            gradingArr.forEach(([name, ratio]) => {
+
+            Object.keys(gradingArr).forEach(grading => {
+                let name = grading;
+                let ratio = gradingArr[grading];
                 if (isNaN(ratio)) {
                     throw Error("Grading ratio is not reconised.");
                 }
@@ -99,48 +108,59 @@ const chooseGradingTypes = (courseObject2) => { // 2
             return true
         }
     }]).then(({ rawGradings }) => {
-        const newGradings = gradingStringParse(rawGradings);
-        const newGradingsNames = newGradings.map(grading => grading[0]);
-        let notReady = [];
-        let ready = [];
+        const newGradings =  {};
+        rawGradings = gradingStringParse(rawGradings);
+
+        Object.keys(rawGradings).forEach(grading => {
+            let gradingName = grading;
+            let gradingRatio = rawGradings[grading]
+            newGradings[gradingName] = Number(gradingRatio);
+        })
+
+        let notReady = {};
+        let ready = {};
         let courseConfig = configs.data.find(course => course.code == courseObject2.code && course.yearInt == courseObject2.yearInt)
 
         if (courseConfig) {
-            newGradings.forEach(([newName, newRatio], i) => {
-                if (courseConfig.gradings.some(([oldName, oldRatio]) => oldName == newName)) {
-                    notReady.push([newName, newRatio]);
+            Object.keys(newGradings).forEach((grading) => {
+                let newName = grading;
+                let newRatio = newGradings[grading];
+
+                if (Object.keys(courseConfig.gradings).some(gradingg => gradingg == newName)) {
+                    notReady[newName] = newRatio;
                     console.log(" ".repeat(spacing_offset) + chalk.bold.red(newName))
                 } else {
-                    ready.push([newName, newRatio]);
+                    ready[newName] = newRatio;
                     console.log(" ".repeat(spacing_offset) + chalk.bold.green(newName))
                 }
             })
-            if (notReady.length) {
+            if (Object.keys(notReady).length != 0) {
                 inquirer.prompt([{
                     name: "conflict",
                     type: "checkbox",
                     message: "Please choose gradings to overwrite." + chalk.bgYellowBright("?"),
-                    choices: notReady.map(course => course[0])
+                    choices: Object.keys(notReady)
                 }]).then(({ conflict }) => {
                     conflict.forEach(gradingName => {
-                        let x = notReady.find(([gName]) => gName == gradingName);
+                        let x = Object.keys(notReady).some(grading => grading == gradingName);
                         if (x) {
-                            ready.push([gradingName, x[1]]);
+                            ready = { ...ready };
+                            ready[gradingName] = notReady[gradingName];
                         }
                     })
-                    ready.sort((a, b) => {
-                        return newGradingsNames.indexOf(a[0]) - newGradingsNames.indexOf(b[0])
-                    })
-                    courseObject2.newGradings = [["Id", 0], ...ready];
+                    courseObject2.newGradings = { "Id": 0, ...ready };
 
                     lastConfirmation(courseObject2);
                 })
             } else {
-                courseObject2.newGradings = [["Id", 0], ...ready];
+                courseObject2.newGradings = { "Id": 0, ...ready };
                 lastConfirmation(courseObject2);
             }
         } else {
-            courseObject2.newGradings = [["Id", 0], ...newGradings];
+            courseObject2.newGradings["Id"] = 0;
+            Object.keys(newGradings).forEach(grading => {
+                courseObject2.newGradings[grading] = newGradings[grading];
+            })
             lastConfirmation(courseObject2);
         }
     })
@@ -164,8 +184,8 @@ const lastConfirmation = (courseObject3) => {
 const generateFile = (courseObject4) => { // 3
     //console.log(chalk.bgGray("3"));
     let rawString;
-    const { code, rawDirectory, newGradings } = courseObject4;
-    const newGradingsNames = newGradings.map((grading) => grading[0]);
+    const { rawDirectory, newGradings } = courseObject4;
+    const newGradingsNames = Object.keys(newGradings);
     let semester = courseObject4.semester == "Fall" ? "F" : courseObject4.semester == "Spring" ? "S" : undefined;
     courseObject4.directory = path.join(path.parse(path.parse(rawDirectory).dir).dir, "courses", `${courseObject4.code}_${courseObject4.yearInt}${semester}.json`);
 
@@ -198,23 +218,21 @@ const generateFile = (courseObject4) => { // 3
             let nums = row.split("\t").map(word => word.trim()).map(num => num = !isNaN(num) ? Number(num) : num == "-" ? null : undefined)
             let student = {};
             for (let i in newGradingsNames) {
-                student[newGradingsNames[i].toLowerCase()] = nums[i]
+                student[newGradingsNames[i].toLowerCase()] = nums[i]//TODO
             }
             return student
         })
-        console.countReset("Not Attended")
         fs.writeFileSync(courseObject4.directory, JSON.stringify(out));
         configs.addCourse(courseObject4);
         finnish(courseObject4);
     }
-
 }
 
 const finnish = (courseObject5) => {
     prompts.courseConfigStatus(spacing_offset, courseObject5)
 }
 const generateEnteryObj = () => {
-    const object = new Course();
+    const object = new CourseRecord();
     chooseDirectory(object);
 
 }

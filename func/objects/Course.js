@@ -1,12 +1,12 @@
 export default class Course {
     constructor() {
-        this.code = null;
-        this.directory = null;
-        this.rawDirectory = null;
-        this.year = null;
-        this.yearInt = null;
-        this.semester = null;
-        this.gradings = [];
-        this.newGradings = [];
+        this.code = null; //EXAMPLE101
+        this.directory = null; //"C:\\Users\\..."
+        this.rawDirectory = null; //"C:\\Users\\..."
+        this.year = null; // Number
+        this.yearInt = null; // Number
+        this.semester = null; // Fall | Spring
+        this.gradings = {}; // {Id:0, Midterm_1: 20, Midterm_2: 20, Final: 40}
+        this.newGradings = {}; // {}
     }
 }

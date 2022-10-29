@@ -44,9 +44,9 @@ const gradingsAndRatios = (gradingArr, spacing) => {
         let sumRatio = 0;
         console.log(chalk.bold(" ".repeat(spacing) + "Registered Gradings: "))
         spacing += 2
-        gradingArr.forEach(grading => {
-            let [name, ratio] = grading;
-
+        Object.keys(gradingArr).forEach(grading => {
+            let name = grading;
+            let ratio = gradingArr[grading];
             sumRatio += ratio;
             name = name.charAt(0).toUpperCase() + name.slice(1);
             if (name != "Id") {
@@ -66,7 +66,7 @@ const courseConfigStatus = (spacing, courseObject) => {
     console.log(" ".repeat(spacing) + chalk.bold.green("Course Code: ") + chalk.bold(courseObject.code));
     console.log(" ".repeat(spacing) + chalk.bold.green("Course Year: ") + chalk.bold(courseObject.year));
     console.log(" ".repeat(spacing) + chalk.bold.green("Course Semester: ") + chalk.bold(courseObject.semester));
-    console.log(" ".repeat(spacing) + chalk.bold.green("Course Gradings: ") + courseObject.gradings.map(grading => chalk.bold(grading[0]) + " " + chalk.bold.blue(grading[1])).join(" , "));
+    console.log(" ".repeat(spacing) + chalk.bold.green("Course Gradings: ") + Object.keys(courseObject.gradings).map(grading => chalk.bold(grading) + " " + chalk.bold.blue(courseObject.gradings[grading])).join(" , "));
     console.log(" ".repeat(spacing) + chalk.bold.green("Course Directory: ") + chalk.bold(courseObject.directory));
 }
 
