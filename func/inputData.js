@@ -4,11 +4,11 @@ import inquirer from "inquirer";
 import inquirerFileTreeSelection from "inquirer-file-tree-selection-prompt";
 import chalk from "chalk";
 
-import { default as home } from "../index.js"
+import { default as goHome } from "../index.js"
 import fileNameParser from "./parsers/fileNameParser.js";
 import prompts from "../func/prompts.js";
 import CourseConfigs from "../func/objects/CourseConfigs.js";
-import CourseRecord from "../func/objects/Course.js";
+import Course from "../func/objects/Course.js";
 inquirer.registerPrompt('file-tree-selection', inquirerFileTreeSelection);
 
 const configeDir = "./src/courses/course_configs.json";
@@ -21,7 +21,9 @@ let configs = new CourseConfigs(configeDir);
 
 let toBeRecordedToCache;
 
-const chooseDirectory = (courseObject) => {  // 0
+let courseObject;
+
+const chooseDirectory = () => {  // 0
     //console.log(chalk.bgGray("0"));
     inquirer.prompt([{
         name: "directory",
@@ -30,12 +32,7 @@ const chooseDirectory = (courseObject) => {  // 0
         root: "./src/raw",
         hideRoot: true
     }]).then(({ directory }) => {
-
-        courseObject.rawDirectory = directory;
-        courseObject.code = fileNameParser(courseObject.rawDirectory).code;
-        courseObject.yearInt = parseInt(fileNameParser(courseObject.rawDirectory).yearInt);
-        courseObject.year = fileNameParser(courseObject.rawDirectory).year;
-        courseObject.semester = fileNameParser(courseObject.rawDirectory).semester;
+        courseObject = new Course(directory);
 
         if (courseObject.code && courseObject.yearInt && courseObject.semester) {
             let isRecorded = configs.getCourse(courseObject.code, courseObject.yearInt, courseObject.semester);
@@ -52,9 +49,9 @@ const chooseDirectory = (courseObject) => {  // 0
             }]).then(({ to_be_recorded }) => {
                 if (to_be_recorded) {
                     toBeRecordedToCache = true;
-                    chooseGradingTypes(courseObject)
+                    chooseGradingTypes()
                 } else {
-                    home()
+                    goHome()
                 }
             })
 
@@ -76,7 +73,7 @@ const gradingStringParse = (string) => {
     return obj
 }
 
-const chooseGradingTypes = (courseObject2) => { // 2
+const chooseGradingTypes = () => { // 2
     //console.log(chalk.bgGray("2"));
 
     console.log("");
@@ -86,8 +83,8 @@ const chooseGradingTypes = (courseObject2) => { // 2
 
         message: `Please enter your grading types and ratios if its more than one seperate with comma (Enter student id with ratio of 0):`,
         type: "input",
-        prefix: prompts.filePreview(courseObject2.rawDirectory, 5, spacing_offset) + chalk.bold.green("?"),
-        
+        prefix: prompts.filePreview(courseObject.rawDirectory, 5, spacing_offset) + chalk.bold.green("?"),
+
         validate(rawGradings) {
             let gradingArr = gradingStringParse(rawGradings);
 
@@ -108,7 +105,7 @@ const chooseGradingTypes = (courseObject2) => { // 2
             return true
         }
     }]).then(({ rawGradings }) => {
-        const newGradings =  {};
+        const newGradings = {};
         rawGradings = gradingStringParse(rawGradings);
 
         Object.keys(rawGradings).forEach(grading => {
@@ -119,7 +116,7 @@ const chooseGradingTypes = (courseObject2) => { // 2
 
         let notReady = {};
         let ready = {};
-        let courseConfig = configs.data.find(course => course.code == courseObject2.code && course.yearInt == courseObject2.yearInt)
+        let courseConfig = configs.data.find(course => course.code == courseObject.code && course.yearInt == courseObject.yearInt)
 
         if (courseConfig) {
             Object.keys(newGradings).forEach((grading) => {
@@ -148,55 +145,55 @@ const chooseGradingTypes = (courseObject2) => { // 2
                             ready[gradingName] = notReady[gradingName];
                         }
                     })
-                    courseObject2.newGradings = { "Id": 0, ...ready };
+                    courseObject.newGradings = { "Id": 0, ...ready };
 
-                    lastConfirmation(courseObject2);
+                    lastConfirmation();
                 })
             } else {
-                courseObject2.newGradings = { "Id": 0, ...ready };
-                lastConfirmation(courseObject2);
+                courseObject.newGradings = { "Id": 0, ...ready };
+                lastConfirmation();
             }
         } else {
-            courseObject2.newGradings["Id"] = 0;
+            courseObject.newGradings["Id"] = 0;
             Object.keys(newGradings).forEach(grading => {
-                courseObject2.newGradings[grading] = newGradings[grading];
+                courseObject.newGradings[grading] = newGradings[grading];
             })
-            lastConfirmation(courseObject2);
+            lastConfirmation();
         }
     })
 }
 
-const lastConfirmation = (courseObject3) => {
+const lastConfirmation = () => {
     inquirer.prompt([{
         name: "confirm",
         type: "confirm",
         message: "Do you confirm?"
     }]).then(({ confirm }) => {
         if (confirm) {
-            generateFile(courseObject3);
+            generateFile();
         } else {
-            home()
+            goHome()
         }
     })
 }
 
 
-const generateFile = (courseObject4) => { // 3
+const generateFile = () => { // 3
     //console.log(chalk.bgGray("3"));
     let rawString;
-    const { rawDirectory, newGradings } = courseObject4;
+    const { rawDirectory, newGradings } = courseObject;
     const newGradingsNames = Object.keys(newGradings);
-    let semester = courseObject4.semester == "Fall" ? "F" : courseObject4.semester == "Spring" ? "S" : undefined;
-    courseObject4.directory = path.join(path.parse(path.parse(rawDirectory).dir).dir, "courses", `${courseObject4.code}_${courseObject4.yearInt}${semester}.json`);
+    let semester = courseObject.semester == "Fall" ? "F" : courseObject.semester == "Spring" ? "S" : undefined;
+    courseObject.directory = path.join(path.parse(path.parse(rawDirectory).dir).dir, "courses", `${courseObject.code}_${courseObject.yearInt}${semester}.json`);
 
     const outArr = [];
 
-    if (fs.existsSync(courseObject4.directory) && (rawString = fs.readFileSync(rawDirectory, "utf-8").trim())) {
-        const courseConfig = configs.getCourse(courseObject4.code, courseObject4.yearInt, courseObject4.semester);
+    if (fs.existsSync(courseObject.directory) && (rawString = fs.readFileSync(rawDirectory, "utf-8").trim())) {
+        const courseConfig = configs.getCourse(courseObject.code, courseObject.yearInt, courseObject.semester);
         if (!courseConfig) {
             console.log(chalk.bgRed("Course file exists but we don't have an archive of it."));
         } else {
-            const course = JSON.parse(fs.readFileSync(courseObject4.directory, "utf-8"));
+            const course = JSON.parse(fs.readFileSync(courseObject.directory, "utf-8"));
             let rows = rawString.split("\n");
             let out = rows.map(row => {
                 let nums = row.split("\t").map(word => word.trim()).map(num => num = !isNaN(num) ? Number(num) : num == "-" ? null : undefined)
@@ -207,9 +204,9 @@ const generateFile = (courseObject4) => { // 3
                 return student
             })
             const result = course.map(student => ({ ...student, ...out.find(stu => stu.id === student.id) }))
-            fs.writeFileSync(courseObject4.directory, JSON.stringify(result))
-            configs.updateCourse(courseObject4);
-            finnish(courseObject4);
+            fs.writeFileSync(courseObject.directory, JSON.stringify(result))
+            configs.updateCourse(courseObject);
+            finnish();
         }
     } else {
         rawString = fs.readFileSync(rawDirectory, "utf-8").trim();
@@ -222,18 +219,17 @@ const generateFile = (courseObject4) => { // 3
             }
             return student
         })
-        fs.writeFileSync(courseObject4.directory, JSON.stringify(out));
-        configs.addCourse(courseObject4);
-        finnish(courseObject4);
+        fs.writeFileSync(courseObject.directory, JSON.stringify(out));
+        configs.addCourse(courseObject);
+        finnish();
     }
 }
 
-const finnish = (courseObject5) => {
-    prompts.courseConfigStatus(spacing_offset, courseObject5)
+const finnish = () => {
+    prompts.courseConfigStatus(spacing_offset, courseObject)
 }
 const generateEnteryObj = () => {
-    const object = new CourseRecord();
-    chooseDirectory(object);
+    chooseDirectory();
 
 }
 export default generateEnteryObj

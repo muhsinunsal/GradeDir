@@ -9,7 +9,7 @@ export default class CourseConfigs {
     }
 
     getCourse(c, yInt, s) {
-        return this.data.find(course => ((course.code == c) && (course.yearInt == yInt) && (course.semester == s)))
+        return this.data.find(course => ((course.code == c) && (course.yearInt == yInt) && (course.semester == s))) || null
     }
 
     addCourse(courseObject) {
