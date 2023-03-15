@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
-//import { promptCourseList } from "./func/courseList.js"; 1
+import promptCourseList from "./func/courseList.js"; 1
 import inputData from "./func/inputData.js";
+import inputNameData from "./func/inputNameData.js";
 import { divFile } from "./func/misc.js";
 import { removeCourseData } from "./func/removeData.js";
 //import { promptStats, cacheObj } from "./func/stats.js";
@@ -46,10 +47,14 @@ const start = () => {
                             name: "ReCount Stats",
                             disabled: "Unavailable right now."
                         },
+                        "Match Student ID's with Names",
                         , "Back", /* .... */
                     ]
                 }]).then(({ other }) => {
                     switch (other) {
+                        case "Match Student ID's with Names":
+                            inputNameData();
+                            break;
                         case "Divide source":
                             divFile();
                             break;

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Zorkonn/GradeDir#readme",
   "dependencies": {
     "chalk": "^5.0.1",
+    "ervy": "^1.0.7",
     "inquirer": "^8.2.4",
     "inquirer-file-tree-selection-prompt": "^1.0.19",
     "inquirer-search-list": "^1.2.6"

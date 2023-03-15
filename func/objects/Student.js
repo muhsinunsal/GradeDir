@@ -1,13 +1,16 @@
 import studentIdParser from "../parsers/studentIdParser.js";
 
-export class Student {
-    constructor(id) {
-        const {registerYear,faculty,department} = studentIdParser(id);
+export default class Student {
+    constructor(id, name = undefined, tookenCourses = []) {
+        const { registerYear, faculty, department } = studentIdParser(id);
         this.id = id;
-        this.name;
+        this.name = name;
         this.registerYear = registerYear;
-        this.faculty = faculty;
-        this.department = department;
-        this.tookenCourses = [];
+        this.faculty = faculty.name; 
+        this.department = department.name;
+        this.takenCourses = tookenCourses;
+    }
+    addCourse(tookenCourse) {
+        this.takenCourses.push()
     }
 }

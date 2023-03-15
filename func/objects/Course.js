@@ -1,10 +1,10 @@
 import fileNameParser from "../parsers/fileNameParser.js";
 export default class Course {
-    constructor(directory) { 
-        const {code , year , yearInt,semester} = fileNameParser(directory);
+    constructor(sourceDirectory) { 
+        const {code , year , yearInt,semester} = fileNameParser(sourceDirectory);
         this.directory = null; //"C:\\Users\\..."
         this.code = code; //EXAMPLE101
-        this.rawDirectory = directory; //"C:\\Users\\..."
+        this.rawDirectory = sourceDirectory; //"C:\\Users\\..."
         this.year = year; // Number
         this.yearInt = yearInt; // Number
         this.semester = semester; // Fall | Spring

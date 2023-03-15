@@ -1,0 +1,26 @@
+[
+  {
+    "id": 16486873354,
+    "name": "Muhammad Wang",
+    "registerYear": 2021,
+    "faculty": "Faculty of Engineering",
+    "department": "CMPE",
+    "tookenCourses": []
+  },
+  {
+    "id": 16452357335,
+    "name": "John Bing",
+    "registerYear": 2020,
+    "faculty": "Aviation",
+    "department": "PLT",
+    "tookenCourses": []
+  },
+  {
+    "id": 12545236735,
+    "name": "Elizabeth Windsor",
+    "registerYear": 2018,
+    "faculty": "Bussines",
+    "department": "IR",
+    "tookenCourses": []
+  }
+]

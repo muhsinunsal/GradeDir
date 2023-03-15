@@ -22,9 +22,9 @@ const fileNameParser = (fileName) => {
     if (yearInt_regex.test(fileName)) {
         obj.yearInt = fileName.match(yearInt_regex)[0];
         if (obj.semester == "Fall") {
-            obj.year = Number("20" + obj.yearInt.charAt(0) + obj.yearInt.charAt(1));
+            obj.year = parseInt("20" + obj.yearInt.charAt(0) + obj.yearInt.charAt(1));
         } else if (obj.semester == "Spring") {
-            obj.year = Number("20" + obj.yearInt.charAt(2) + obj.yearInt.charAt(3));
+            obj.year = parseInt("20" + obj.yearInt.charAt(2) + obj.yearInt.charAt(3));
         } else {
             obj.year = null;
         };
