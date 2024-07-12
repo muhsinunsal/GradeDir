@@ -134,32 +134,32 @@
       },
       {
         "name": "CHE",
-        "code": 41,
+        "code": 42,
         "fullName": "Chemical Engineering"
       },
       {
         "name": "ME",
-        "code": 41,
+        "code": 43,
         "fullName": "Mechanical Engineering"
       },
       {
         "name": "MECE",
-        "code": 41,
+        "code": 44,
         "fullName": "Mechatronics Engineering"
       },
       {
         "name": "MATE",
-        "code": 41,
+        "code": 45,
         "fullName": "Metallurgical and Materials Engineering"
       },
       {
         "name": "AE",
-        "code": 41,
+        "code": 46,
         "fullName": "Automotive Engineering"
       },
       {
         "name": "SE",
-        "code": 41,
+        "code": 47,
         "fullName": "Software Engineering"
       },
       {
